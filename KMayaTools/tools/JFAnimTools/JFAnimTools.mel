@@ -1,0 +1,34 @@
+global proc string[] getCurrentPlace(string $procName)
+{
+	string $rtn[];	
+	string $tokBufA[];
+	string $s = `whatIs $procName`;
+
+	int $tokNumA = `tokenize $s ":" $tokBufA`;
+	string $drive = endString($tokBufA[1],1);
+	string $fullPath = $drive +":"+ $tokBufA[2];
+
+	string $dir = dirname( $fullPath );
+	string $basename = basename($fullPath, ".mel");
+	$rtn[0] = $drive;
+	$rtn[1] = $dir;
+	$rtn[2] = $basename;
+	$rtn[3] = $fullPath;
+	return $rtn;
+}
+
+global proc JFAnimTools()
+{
+	string $melfuncName = "JFAnimTools";
+	string $place[] = getCurrentPlace($melfuncName);
+	string $ToolRoot = $place[1];
+
+	python("import sys");
+	python("_path = sys.path");
+	python("found=False\nfor p in _path:\n	if(p==\""+$ToolRoot+"\"):\n		found=True\nif(not found):\n	sys.path.append(\""+$ToolRoot+"\")");
+	python("import JFAnimTools");
+	python("reload(JFAnimTools)");
+	python("JFAnimTools.JFAnmTools()");
+}
+
+JFAnimTools;
